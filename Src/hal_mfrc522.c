@@ -48,7 +48,7 @@ MFRC522_Status HAL_MFRC522_Reset(MFRC522 *rfid) {
 	uint8_t countTries = 0;
 	do {
 		HAL_Delay(50);
-		data = HAL_MFRC522_ReadRegister(rfid, READ_CommandReg);
+		data = HAL_MFRC522_ReadRegister(rfid, CommandReg);
 	} while((data & (1 << 4)) && ((++countTries) < 3 /* Timeout after 3 tries. */));
 
 	// Try 2. step 3 times... otherwise return Timeout...
