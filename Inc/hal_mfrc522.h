@@ -21,4 +21,13 @@
 #ifndef HAL_MFRC522_H
 #define HAL_MFRC522_H
 
+#include <stdint.h>
+// Change this hal include according to your device...
+#include <stm32f7xx_hal.h>
+
+typedef struct {
+	GPIO_TypeDef* Port;
+	uint16_t Pin;
+} GPIO_Pin;
+
 #endif
