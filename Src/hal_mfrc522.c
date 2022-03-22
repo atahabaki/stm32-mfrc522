@@ -1,5 +1,5 @@
 /*
- *  STM32 MFRC522 Driver - An android application for those who aims to learn a new language.
+ *  STM32 MFRC522 Driver - STM32 HAL Library for MFRC522 RFID Card Reader
  *  Copyright (C) 2022 A. Taha Baki
  *
  *  This file is part of STM32 MFRC522 Driver.
