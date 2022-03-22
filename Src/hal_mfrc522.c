@@ -96,3 +96,64 @@ MFRC522_Status HAL_MFRC522_Close_Antenna(MFRC522 *rfid) {
 	#endif
 	return status;
 }
+
+MFRC522_Status HAL_MFRC522_Init(MFRC522 *rfid) {
+	// First Reset...
+	HAL_MFRC522_Reset(rfid);
+	// Reset baudrates...
+	HAL_MFRC522_WriteRegister(rfid, TxModeReg, 0x00);
+	#if TEST_WRITE
+		if (HAL_MFRC522_ReadRegister(rfid, TxModeReg) != 0x00)
+			return RC522_ERR;
+	#endif
+	HAL_MFRC522_WriteRegister(rfid, RxModeReg, 0x00);
+	#if TEST_WRITE
+		if (HAL_MFRC522_ReadRegister(rfid, RxModeReg) != 0x00)
+			return RC522_ERR;
+	#endif
+	// Reset ModWidthReg...
+	HAL_MFRC522_WriteRegister(rfid, ModWidthReg, 0x26);
+	#if TEST_WRITE
+		if (HAL_MFRC522_ReadRegister(rfid, ModWidthReg) != 0x26)
+			return RC522_ERR;
+	#endif
+	// Timer...
+	HAL_MFRC522_WriteRegister(rfid, TModeReg, 0x80);
+	#if TEST_WRITE
+		if (HAL_MFRC522_ReadRegister(rfid, TModeReg) != 0x80)
+			return RC522_ERR;
+	#endif
+	HAL_MFRC522_WriteRegister(rfid, TPrescalerReg, 0xA9);
+	#if TEST_WRITE
+		if (HAL_MFRC522_ReadRegister(rfid, TPrescalerReg) != 0xA9)
+			return RC522_ERR;
+	#endif
+	HAL_MFRC522_WriteRegister(rfid, TReloadRegH, 0x03);
+	#if TEST_WRITE
+		if (HAL_MFRC522_ReadRegister(rfid, TReloadRegH) != 0x03)
+			return RC522_ERR;
+	#endif
+	HAL_MFRC522_WriteRegister(rfid, TReloadRegL, 0xE8);
+	#if TEST_WRITE
+		if (HAL_MFRC522_ReadRegister(rfid, TReloadRegL) != 0xE8)
+			return RC522_ERR;
+	#endif
+	HAL_MFRC522_WriteRegister(rfid, TxASKReg, 0x40);
+	#if TEST_WRITE
+		if (HAL_MFRC522_ReadRegister(rfid, TxASKReg) != 0x40)
+			return RC522_ERR;
+	#endif
+	HAL_MFRC522_WriteRegister(rfid, ModeReg, 0x3D);
+	#if TEST_WRITE
+		if (HAL_MFRC522_ReadRegister(rfid, ModeReg) != 0x3D)
+			return RC522_ERR;
+	#endif
+
+	HAL_MFRC522_Open_Antenna(rfid);
+	HAL_Delay(4);
+
+	uint8_t version = HAL_MFRC522_ReadRegister(rfid, VersionReg);
+	if (version == 0x91 || version == 0x92)
+		return RC522_OK;
+	else return RC522_UNKNOWN_BOARD;
+}
