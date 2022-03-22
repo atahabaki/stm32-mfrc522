@@ -160,4 +160,11 @@ typedef enum {
 	SoftReset=0x0F
 } MFRC522_CMD;
 
+typedef enum {
+	RC522_OK,
+	RC522_TIMEOUT,
+	RC522_ERR,
+	RC522_UNKNOWN_BOARD,
+} MFRC522_Status;
+
 #endif
