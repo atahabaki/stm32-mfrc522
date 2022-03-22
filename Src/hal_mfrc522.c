@@ -42,17 +42,20 @@ uint8_t HAL_MFRC522_ReadRegister(MFRC522 *rfid, MFRC522_Reg addr) {
 
 MFRC522_Status HAL_MFRC522_Reset(MFRC522 *rfid) {
 	// 1. Write "SoftReset" into CommandReg register...
-	HAL_MFRC522_WriteRegister(rfid, CommandReg, SoftReset);
+	HAL_MFRC522_WriteRegister(rfid, CommandReg, SoftReset|0x10);
 	// 2. check PowerDownBit is set to 1...
 	uint8_t data;
 	uint8_t countTries = 0;
-	do {
-		HAL_Delay(50);
+  while (countTries < 3) {
 		data = HAL_MFRC522_ReadRegister(rfid, CommandReg);
-	} while((data & (1 << 4)) && ((++countTries) < 3 /* Timeout after 3 tries. */));
+    if (data == 16)
+      return RC522_OK;
+		HAL_Delay(50);
+    countTries++;
+  }
 
 	// Try 2. step 3 times... otherwise return Timeout...
-	return RC522_OK;
+	return RC522_TIMEOUT;
 }
 
 MFRC522_Status HAL_MFRC522_SetBitMask(MFRC522 *rfid, MFRC522_Reg addr, uint8_t mask) {
