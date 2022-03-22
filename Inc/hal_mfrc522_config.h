@@ -1,3 +1,6 @@
+#ifndef HAL_MFRC522_CONFIG_H
+#define HAL_MFRC522_CONFIG_H
+
 /**
  * Default timeout for SPI communication.
  */
@@ -7,3 +10,5 @@
  * Not suggested for production.
  */
 #define TEST_WRITE 1
+
+#endif
