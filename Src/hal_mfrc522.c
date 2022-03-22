@@ -54,3 +54,17 @@ MFRC522_Status HAL_MFRC522_Reset(MFRC522 *rfid) {
 	// Try 2. step 3 times... otherwise return Timeout...
 	return RC522_OK;
 }
+
+MFRC522_Status HAL_MFRC522_SetBitMask(MFRC522 *rfid, MFRC522_Reg addr, uint8_t mask) {
+  uint8_t w_addr = addr << 1;
+  uint8_t r_addr = _addr | 0x80;
+	uint8_t tmp = HAL_MFRC522_ReadRegister(rfid, r_addr);
+	return HAL_MFRC522_WriteRegister(rfid, w_addr, tmp | mask);
+}
+
+MFRC522_Status HAL_MFRC522_ClearBitMask(MFRC522 *rfid, MFRC522_Reg addr, uint8_t mask) {
+  uint8_t w_addr = addr << 1;
+  uint8_t r_addr = _addr | 0x80;
+	uint8_t tmp = HAL_MFRC522_ReadRegister(rfid, r_addr);
+	return HAL_MFRC522_WriteRegister(rfid, w_addr, tmp & (~mask));
+}
