@@ -39,3 +39,18 @@ uint8_t HAL_MFRC522_ReadRegister(MFRC522 *rfid, MFRC522_Reg addr) {
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, GPIO_PIN_SET); // Disable the MFRC522 chip..
 	return data[1];
 }
+
+MFRC522_Status HAL_MFRC522_Reset(MFRC522 *rfid) {
+	// 1. Write "SoftReset" into CommandReg register...
+	HAL_MFRC522_WriteRegister(rfid, CommandReg, SoftReset);
+	// 2. check PowerDownBit is set to 1...
+	uint8_t data;
+	uint8_t countTries = 0;
+	do {
+		HAL_Delay(50);
+		data = HAL_MFRC522_ReadRegister(rfid, READ_CommandReg);
+	} while((data & (1 << 4)) && ((++countTries) < 3 /* Timeout after 3 tries. */));
+
+	// Try 2. step 3 times... otherwise return Timeout...
+	return RC522_OK;
+}
