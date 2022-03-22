@@ -142,7 +142,7 @@ typedef enum {
   // 3Ch to 3Fh Reserved reserved for production tests Table 141 to Table 147 on
   // page 69
 
-} MFRC522_Reg_Read;
+} MFRC522_Reg;
 
 typedef enum {
 	Idle= 0x00,       // no action, cancels current command execution
