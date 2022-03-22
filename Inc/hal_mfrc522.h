@@ -30,4 +30,9 @@ typedef struct {
 	uint16_t Pin;
 } GPIO_Pin;
 
+typedef struct {
+	GPIO_Pin ss_pin;
+	SPI_HandleTypeDef *hspi;
+} MFRC522;
+
 #endif
