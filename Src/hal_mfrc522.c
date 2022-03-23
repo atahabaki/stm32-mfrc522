@@ -92,6 +92,18 @@ MFRC522_Status HAL_MFRC522_ClearBitMask(MFRC522 *rfid, MFRC522_Reg addr, uint8_t
 	return HAL_MFRC522_WriteRegister(rfid, addr, tmp & (~mask));
 }
 
+uint8_t HAL_MFRC522_GetAntennaGain(MFRC522 *rfid) {
+  return HAL_MFRC522_ReadRegister(rfid, RFCfgReg) & (0x07<<4);
+}
+
+MFRC522_Status HAL_MFRC522_SetAntennaGain(MFRC522 *rfid, uint8_t mask) {
+  if (HAL_MFRC522_GetAntennaGain(rfid) != mask) {
+    HAL_MFRC522_ClearBitMask(rfid, RFCfgReg, (0x07<<4));
+    HAL_MFRC522_SetBitMask(rfid, RFCfgReg, mask & (0x07<<4));
+  }
+  return RC522_OK;
+}
+
 MFRC522_Status HAL_MFRC522_Open_Antenna(MFRC522 *rfid) {
 	#if TEST_WRITE
 		uint8_t _prev = HAL_MFRC522_ReadRegister(rfid, TxControlReg);

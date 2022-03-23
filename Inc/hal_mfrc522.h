@@ -178,5 +178,7 @@ MFRC522_Status HAL_MFRC522_Close_Antenna(MFRC522 *rfid);
 MFRC522_Status HAL_MFRC522_Init(MFRC522 *rfid);
 MFRC522_Status HAL_MFRC522_SoftPowerDown(MFRC522 *rfid);
 MFRC522_Status HAL_MFRC522_SoftPowerUp(MFRC522 *rfid);
+uint8_t HAL_MFRC522_GetAntennaGain(MFRC522 *rfid);
+MFRC522_Status HAL_MFRC522_SetAntennaGain(MFRC522 *rfid, uint8_t mask);
 
 #endif
