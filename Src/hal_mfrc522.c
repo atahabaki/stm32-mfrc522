@@ -201,3 +201,22 @@ MFRC522_Status HAL_MFRC522_Init(MFRC522 *rfid) {
 		return RC522_OK;
 	else return RC522_UNKNOWN_BOARD;
 }
+
+MFRC522_Status HAL_MFRC522_CalculateCRC(MFRC522 *rfid, uint8_t *data, uint8_t length, uint8_t *result) {
+  HAL_MFRC522_WriteRegister(rfid, CommandReg, Idle);
+  HAL_MFRC522_WriteRegister(rfid, DivIrqReg, 0x04);
+  HAL_MFRC522_WriteRegister(rfid, FIFOLevelReg, 0x80);
+  HAL_MFRC522_WriteRegister_Multi(rfid, FIFODataReg, length, data);
+  HAL_MFRC522_WriteRegister(rfid, CommandReg, CalcCRC);
+  for (uint16_t i = 5000; i > 0; i--) {
+    uint8_t n = HAL_MFRC522_ReadRegister(rfid, DivIrqReg);
+    if (n & 0x04) {
+      // Stop calculation...
+      HAL_MFRC522_WriteRegister(CommandReg, Idle);
+      result[0] = HAL_MFRC522_ReadRegister(CRCResultRegL);
+      result[1] = HAL_MFRC522_ReadRegister(CRCResultRegH);
+      return RC522_OK;
+    }
+  }
+  return RC522_TIMEOUT;
+}
