@@ -58,6 +58,12 @@ MFRC522_Status HAL_MFRC522_Reset(MFRC522 *rfid) {
 	return RC522_TIMEOUT;
 }
 
+MFRC522_Status HAL_MFRC522_SoftPowerDown(MFRC522 *rfid) {
+  uint8_t val = HAL_MFRC522_ReadRegister(rfid, CommandReg);
+  val |= (1<<4);
+  HAL_MFRC522_WriteRegister(rfid, CommandReg, val);
+}
+
 MFRC522_Status HAL_MFRC522_SetBitMask(MFRC522 *rfid, MFRC522_Reg addr, uint8_t mask) {
 	uint8_t tmp = HAL_MFRC522_ReadRegister(rfid, addr);
 	return HAL_MFRC522_WriteRegister(rfid, addr, tmp | mask);
