@@ -29,6 +29,15 @@ MFRC522_Status HAL_MFRC522_WriteRegister(MFRC522 *rfid, MFRC522_Reg addr, uint8_
 	return RC522_OK;
 }
 
+MFRC522_Status HAL_MFRC522_WriteRegister_Multi(MFRC522 *rfid, MFRC522_Reg addr, uint16_t count, uint8_t *data) {
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, GPIO_PIN_RESET); // Select the MFRC522 chip..
+  uint8_t _addr = addr << 1;
+	HAL_SPI_Transmit(rfid->hspi, &_addr, 1, HAL_MFRC522_DEFAULT_TIMEOUT); // Send address first...
+	HAL_SPI_Transmit(rfid->hspi, data, count, HAL_MFRC522_DEFAULT_TIMEOUT); // Then, send the data...
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, GPIO_PIN_SET); // Disable the MFRC522 chip..
+	return RC522_OK;
+}
+
 uint8_t HAL_MFRC522_ReadRegister(MFRC522 *rfid, MFRC522_Reg addr) {
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, GPIO_PIN_RESET); // Select the MFRC522 chip..
 	//HAL_SPI_Transmit(rfid->hspi, &addr, 1, HAL_MFRC522_DEFAULT_TIMEOUT); // Send address first...
