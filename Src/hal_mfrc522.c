@@ -59,9 +59,13 @@ MFRC522_Status HAL_MFRC522_Reset(MFRC522 *rfid) {
 }
 
 MFRC522_Status HAL_MFRC522_SoftPowerDown(MFRC522 *rfid) {
-  uint8_t val = HAL_MFRC522_ReadRegister(rfid, CommandReg);
-  val |= (1<<4);
-  HAL_MFRC522_WriteRegister(rfid, CommandReg, val);
+  HAL_MFRC522_WriteRegister(rfid, CommandReg, 0x10);
+  #if TEST_WRITE
+    uint8_t is_powered_down = HAL_MFRC522_ReadRegister(rfid, CommandReg);
+    if ((is_powered_down & 0x10) != 0x10)
+      return RC522_ERR;
+  #endif
+  return RC522_OK;
 }
 
 MFRC522_Status HAL_MFRC522_SetBitMask(MFRC522 *rfid, MFRC522_Reg addr, uint8_t mask) {
