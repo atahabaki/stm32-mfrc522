@@ -212,7 +212,7 @@ MFRC522_Status HAL_MFRC522_CalculateCRC(MFRC522 *rfid, uint8_t *data, uint8_t le
     uint8_t n = HAL_MFRC522_ReadRegister(rfid, DivIrqReg);
     if (n & 0x04) {
       // Stop calculation...
-      HAL_MFRC522_WriteRegister(CommandReg, Idle);
+      HAL_MFRC522_WriteRegister(rfid, CommandReg, Idle);
       result[0] = HAL_MFRC522_ReadRegister(rfid, CRCResultRegL);
       result[1] = HAL_MFRC522_ReadRegister(rfid, CRCResultRegH);
       return RC522_OK;
