@@ -220,3 +220,72 @@ MFRC522_Status HAL_MFRC522_CalculateCRC(MFRC522 *rfid, uint8_t *data, uint8_t le
   }
   return RC522_TIMEOUT;
 }
+
+MFRC522_Status HAL_MFRC522_CommunicatePICC(MFRC522 *rfid, uint8_t command, uint8_t waitIRq, uint8_t *sendData, uint8_t sendLen, uint8_t *backData, uint8_t *backLen, uint8_t *validBits, uint8_t rxAlign, bool checkCRC) {
+  uint8_t txLastBits = validBits ? *validBits : 0;
+  uint8_t bitFraming = (rxAlign << 4)+txLastBits;
+
+  HAL_MFRC522_WriteRegister(rfid, CommandReg, Idle);      // Stop any active command.
+  HAL_MFRC522_WriteRegister(rfid, ComIrqReg, 0x7F);          // Clear all seven interrupt request bits
+  HAL_MFRC522_WriteRegister(rfid, FIFOLevelReg, 0x80);        // FlushBuffer = 1, FIFO initialization
+  HAL_MFRC522_WriteRegister_Multi(rfid, FIFODataReg, sendLen, sendData);  // Write sendData to the FIFO
+  HAL_MFRC522_WriteRegister_Multi(rfid, BitFramingReg, bitFraming);    // Bit adjustments
+  HAL_MFRC522_WriteRegister(rfid, CommandReg, command);        // Execute the command
+  if(command == Transceive)
+    HAL_MFRC522_SetBitMask(rfid, BitFramingReg, 0x80);  // StartSend=1, transmission of data starts
+
+  uint16_t i;
+  for(i = 2000; i > 0; i--) {
+    uint8_t n = HAL_MFRC522_ReadRegister(rfid, ComIrqReg);  // ComIrqReg[7..0] bits are: Set1 TxIRq RxIRq IdleIRq HiAlertIRq LoAlertIRq ErrIRq TimerIRq
+    if(n & waitIRq)          // One of the interrupts that signal success has been set.
+      break;
+    if(n & 0x01)            // Timer interrupt - nothing received in 25ms
+      return RC522_TIMEOUT;
+  }
+  // 35.7ms and nothing happened. Communication with the MFRC522 might be down.
+  if(i == 0)
+    return RC522_TIMEOUT;
+  
+  // Stop now if any errors except collisions were detected.
+  uint8_t errorRegValue = HAL_MFRC522_ReadRegister(rfid, ErrorReg); // ErrorReg[7..0] bits are: WrErr TempErr reserved BufferOvfl CollErr CRCErr ParityErr ProtocolErr
+  if(errorRegValue & 0x13)   // BufferOvfl ParityErr ProtocolErr
+    return RC522_ERR;
+  
+  uint8_t _validBits = 0;
+  
+  // If the caller wants data back, get it from the MFRC522.
+  if(backData && backLen) {
+    uint8_t n = HAL_MFRC522_ReadRegister(rfid, FIFOLevelReg);  // Number of bytes in the FIFO
+    if(n > *backLen) {
+      return RC522_NO_ROOM;
+    }
+    *backLen = n;                      // Number of bytes returned
+    HAL_MFRC522_ReadRegister(rfid, FIFODataReg, n, backData, rxAlign);  // Get received data from FIFO
+    _validBits = HAL_MFRC522_ReadRegister(rfid, ControlReg) & 0x07;    // RxLastBits[2:0] indicates the number of valid bits in the last received byte. If this value is 000b, the whole byte is valid.
+    if(validBits)
+      *validBits = _validBits;
+  }
+  
+  // Tell about collisions
+  if(errorRegValue & 0x08)    // CollErr
+    return RC522_COLLISION;
+  
+  // Perform CRC_A validation if requested.
+  if(backData && backLen && checkCRC) {
+    // In this case a MIFARE Classic NAK is not OK.
+    if(*backLen == 1 && _validBits == 4)
+      return RC522_MIFARE_NACK;
+    // We need at least the CRC_A value and all 8 bits of the last byte must be received.
+    if(*backLen < 2 || _validBits != 0)
+      return RC522_CRC_WRONG;
+    // Verify CRC_A - do our own calculation and store the control in controlBuffer.
+    uint8_t controlBuffer[2];
+    MFRC522_Status status = HAL_MFRC522_CalculateCRC(rfid, &backData[0], *backLen-2, &controlBuffer[0]);
+    if(status != RC522_OK)
+      return status;
+    if((backData[*backLen-2] != controlBuffer[0]) || (backData[*backLen-1] != controlBuffer[1])) 
+      return RC522_CRC_WRONG;
+  }
+  
+  return StatusCode::STATUS_OK;
+}
