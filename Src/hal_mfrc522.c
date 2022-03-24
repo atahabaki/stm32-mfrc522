@@ -44,7 +44,7 @@ u8 HAL_MFRC522_ReadRegister(MFRC522 *rfid, MFRC522_Reg addr) {
   u8 _addr = (addr << 1) | 0x80;
   HAL_SPI_Transmit(rfid->hspi, &_addr, 1, HAL_MFRC522_DEFAULT_TIMEOUT);
   // Read the value back. Send 0 to stop reading.
-  HAL_SPI_TransmitReceive(rfid->hspi, &zero, &value, 1, HAL_MFRC522_DEFAULT_TIMEOUT);
+  HAL_SPI_TransmitReceive(rfid->hspi, (u8*)0x00, &value, 1, HAL_MFRC522_DEFAULT_TIMEOUT);
 	HAL_GPIO_WritePin(rfid->ss_pin.Port, rfid->ss_pin.Pin, GPIO_PIN_SET); // Disable the MFRC522 chip..
 	return value;
 }
