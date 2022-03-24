@@ -27,6 +27,9 @@
 // Change this hal include according to your device...
 #include <stm32f7xx_hal.h>
 
+#define u8 uint8_t
+#define byte u8
+
 typedef struct {
 	GPIO_TypeDef* Port;
 	uint16_t Pin;
