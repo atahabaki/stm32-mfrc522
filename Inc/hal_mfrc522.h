@@ -183,5 +183,6 @@ uint8_t HAL_MFRC522_GetAntennaGain(MFRC522 *rfid);
 MFRC522_Status HAL_MFRC522_SetAntennaGain(MFRC522 *rfid, uint8_t mask);
 MFRC522_Status HAL_MFRC522_CalculateCRC(MFRC522 *rfid, uint8_t *data, uint8_t length, uint8_t *result);
 MFRC522_Status HAL_MFRC522_CommunicatePICC(MFRC522 *rfid, uint8_t command, uint8_t waitIRq, uint8_t *sendData, uint8_t sendLen, uint8_t *backData, uint8_t *backLen, uint8_t *validBits, uint8_t rxAlign, bool checkCRC);
+MFRC522_Status HAL_MFRC522_TransceiveData(MFRC522 *rfid, uint8_t *sendData, uint8_t sendLen, uint8_t *backData, uint8_t *backLen, uint8_t *validBits, uint8_t rxAlign, bool checkCRC);
 
 #endif
