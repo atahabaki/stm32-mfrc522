@@ -295,7 +295,7 @@ MFRC522_Status HAL_MFRC522_CommunicatePICC(MFRC522 *rfid, uint8_t command, uint8
       return RC522_NO_ROOM;
     }
     *backLen = n;                      // Number of bytes returned
-    HAL_MFRC522_ReadRegister(rfid, FIFODataReg, n, backData, rxAlign);  // Get received data from FIFO
+    HAL_MFRC522_ReadRegister_Multi(rfid, FIFODataReg, n, backData, rxAlign);  // Get received data from FIFO
     _validBits = HAL_MFRC522_ReadRegister(rfid, ControlReg) & 0x07;    // RxLastBits[2:0] indicates the number of valid bits in the last received byte. If this value is 000b, the whole byte is valid.
     if(validBits)
       *validBits = _validBits;
