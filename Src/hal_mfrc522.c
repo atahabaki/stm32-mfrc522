@@ -51,7 +51,7 @@ u8 HAL_MFRC522_ReadRegister(MFRC522 *rfid, MFRC522_Reg addr) {
 
 void HAL_MFRC522_ReadRegister_Multi(MFRC522 *rfid, MFRC522_Reg addr, u8 count, u8 *values, u8 rxAlign) {
   if (count == 0) { return; }
-  u8 address = 0x80 | reg;  // MSB == 1 is for reading. LSB is not used in address. Datasheet section 8.1.2.3.
+  u8 address = addr | 0x80;  // MSB == 1 is for reading. LSB is not used in address. Datasheet section 8.1.2.3.
   u8 index = 0;             // Index in values array.
   u8 zero = 0;
 	HAL_GPIO_WritePin(rfid->ss_pin.Port, rfid->ss_pin.Pin, GPIO_PIN_RESET); // Select the MFRC522 chip..
