@@ -49,6 +49,41 @@ uint8_t HAL_MFRC522_ReadRegister(MFRC522 *rfid, MFRC522_Reg addr) {
 	return data[1];
 }
 
+void HAL_MFRC522_ReadRegister_Multi(MFRC522 *rfid, MFRC522_Reg addr, u8 count, u8 *values, u8 rxAlign) {
+  if (count == 0) { return; }
+  u8 address = 0x80 | reg;  // MSB == 1 is for reading. LSB is not used in address. Datasheet section 8.1.2.3.
+  u8 index = 0;             // Index in values array.
+  u8 zero = 0;
+	HAL_GPIO_WritePin(rfid->ss_pin.Port, rfid->ss_pin.Pin, GPIO_PIN_RESET); // Select the MFRC522 chip..
+  count--;                       // One read is performed outside of the loop
+  //  (void) m_SPI.write(address);   // Tell MFRC522 which address we want to read
+  HAL_SPI_Transmit(hspi, &address, 1, 500);
+  while (index < count)
+  {
+    if ((index == 0) && rxAlign) // Only update bit positions rxAlign..7 in values[0]
+    {
+      // Create bit mask for bit positions rxAlign..7
+      u8 mask = 0;
+      for (u8 i = rxAlign; i <= 7; i++)
+        mask |= (1 << i);
+      // Read value and tell that we want to read the same address again.
+      // uint8_t value = m_SPI.write(address);
+      u8 value;
+      HAL_SPI_TransmitReceive(hspi, &address, &value, 1, 500);
+      // Apply mask to both current value of values[0] and the new data in value.
+      values[0] = (values[index] & ~mask) | (value & mask);
+    }
+    // Read value and tell that we want to read the same address again.
+    // values[index] = m_SPI.write(address);
+    else
+      HAL_SPI_TransmitReceive(hspi, &address, &(values[index]), 1, 500);
+    index++;
+  }
+  //  values[index] = m_SPI.write(0); // Read the final byte. Send 0 to stop reading.
+  HAL_SPI_TransmitReceive(hspi, &zero, &(values[index]), 1, 500);
+	HAL_GPIO_WritePin(rfid->ss_pin.Port, rfid->ss_pin.Pin, GPIO_PIN_SET); // Disable the MFRC522 chip..
+}
+
 MFRC522_Status HAL_MFRC522_Reset(MFRC522 *rfid) {
 	// 1. Write "SoftReset" into CommandReg register...
 	HAL_MFRC522_WriteRegister(rfid, CommandReg, SoftReset|0x10);

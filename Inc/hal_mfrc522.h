@@ -179,6 +179,7 @@ typedef enum {
 MFRC522_Status HAL_MFRC522_WriteRegister(MFRC522 *rfid, MFRC522_Reg addr, uint8_t data);
 MFRC522_Status HAL_MFRC522_WriteRegister_Multi(MFRC522 *rfid, MFRC522_Reg addr, uint16_t count, uint8_t *data);
 uint8_t HAL_MFRC522_ReadRegister(MFRC522 *rfid, MFRC522_Reg addr);
+void HAL_MFRC522_ReadRegister_Multi(MFRC522 *rfid, MFRC522_Reg addr, u8 count, u8 *values, u8 rxAlign);
 MFRC522_Status HAL_MFRC522_Reset(MFRC522 *rfid);
 MFRC522_Status HAL_MFRC522_SetBitMask(MFRC522 *rfid, MFRC522_Reg addr, uint8_t mask);
 MFRC522_Status HAL_MFRC522_ClearBitMask(MFRC522 *rfid, MFRC522_Reg addr, uint8_t mask);
