@@ -229,7 +229,7 @@ MFRC522_Status HAL_MFRC522_CommunicatePICC(MFRC522 *rfid, uint8_t command, uint8
   HAL_MFRC522_WriteRegister(rfid, ComIrqReg, 0x7F);          // Clear all seven interrupt request bits
   HAL_MFRC522_WriteRegister(rfid, FIFOLevelReg, 0x80);        // FlushBuffer = 1, FIFO initialization
   HAL_MFRC522_WriteRegister_Multi(rfid, FIFODataReg, sendLen, sendData);  // Write sendData to the FIFO
-  HAL_MFRC522_WriteRegister_Multi(rfid, BitFramingReg, bitFraming);    // Bit adjustments
+  HAL_MFRC522_WriteRegister(rfid, BitFramingReg, bitFraming);    // Bit adjustments
   HAL_MFRC522_WriteRegister(rfid, CommandReg, command);        // Execute the command
   if(command == Transceive)
     HAL_MFRC522_SetBitMask(rfid, BitFramingReg, 0x80);  // StartSend=1, transmission of data starts
