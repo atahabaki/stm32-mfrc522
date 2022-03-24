@@ -22,6 +22,7 @@
 #define HAL_MFRC522_H
 
 #include <stdint.h>
+#include <stdbool.h>
 #include <hal_mfrc522_config.h>
 // Change this hal include according to your device...
 #include <stm32f7xx_hal.h>
