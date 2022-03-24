@@ -287,7 +287,7 @@ MFRC522_Status HAL_MFRC522_CommunicatePICC(MFRC522 *rfid, uint8_t command, uint8
       return RC522_CRC_WRONG;
   }
   
-  return StatusCode::STATUS_OK;
+  return RC522_OK;
 }
 
 MFRC522_Status HAL_MFRC522_TransceiveData(MFRC522 *rfid, uint8_t *sendData, uint8_t sendLen, uint8_t *backData, uint8_t *backLen, uint8_t *validBits, uint8_t rxAlign, bool checkCRC) {
