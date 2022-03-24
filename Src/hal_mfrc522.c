@@ -42,10 +42,10 @@ u8 HAL_MFRC522_ReadRegister(MFRC522 *rfid, MFRC522_Reg addr) {
   u8 value;
 	HAL_GPIO_WritePin(rfid->ss_pin.Port, rfid->ss_pin.Pin, GPIO_PIN_RESET); // Select the MFRC522 chip..
   u8 _addr = (addr << 1) | 0x80;
-  HAL_SPI_Transmit(hspi, &_addr, 1, 500);
+  HAL_SPI_Transmit(hspi, &_addr, 1, HAL_MFRC522_DEFAULT_TIMEOUT);
   // Read the value back. Send 0 to stop reading.
   //  value = m_SPI.write(0);
-  HAL_SPI_TransmitReceive(hspi, &zero, &value, 1, 500)
+  HAL_SPI_TransmitReceive(hspi, &zero, &value, 1, HAL_MFRC522_DEFAULT_TIMEOUT);
 	HAL_GPIO_WritePin(rfid->ss_pin.Port, rfid->ss_pin.Pin, GPIO_PIN_SET); // Disable the MFRC522 chip..
 	return value;
 }
@@ -58,7 +58,7 @@ void HAL_MFRC522_ReadRegister_Multi(MFRC522 *rfid, MFRC522_Reg addr, u8 count, u
 	HAL_GPIO_WritePin(rfid->ss_pin.Port, rfid->ss_pin.Pin, GPIO_PIN_RESET); // Select the MFRC522 chip..
   count--;                       // One read is performed outside of the loop
   //  (void) m_SPI.write(address);   // Tell MFRC522 which address we want to read
-  HAL_SPI_Transmit(rfid->hspi, &address, 1, 500);
+  HAL_SPI_Transmit(rfid->hspi, &address, 1, HAL_MFRC522_DEFAULT_TIMEOUT);
   while (index < count)
   {
     if ((index == 0) && rxAlign) // Only update bit positions rxAlign..7 in values[0]
@@ -70,18 +70,18 @@ void HAL_MFRC522_ReadRegister_Multi(MFRC522 *rfid, MFRC522_Reg addr, u8 count, u
       // Read value and tell that we want to read the same address again.
       // u8 value = m_SPI.write(address);
       u8 value;
-      HAL_SPI_TransmitReceive(rfid->hspi, &address, &value, 1, 500);
+      HAL_SPI_TransmitReceive(rfid->hspi, &address, &value, 1, HAL_MFRC522_DEFAULT_TIMEOUT);
       // Apply mask to both current value of values[0] and the new data in value.
       values[0] = (values[index] & ~mask) | (value & mask);
     }
     // Read value and tell that we want to read the same address again.
     // values[index] = m_SPI.write(address);
     else
-      HAL_SPI_TransmitReceive(rfid->hspi, &address, &(values[index]), 1, 500);
+      HAL_SPI_TransmitReceive(rfid->hspi, &address, &(values[index]), 1, HAL_MFRC522_DEFAULT_TIMEOUT);
     index++;
   }
   //  values[index] = m_SPI.write(0); // Read the final byte. Send 0 to stop reading.
-  HAL_SPI_TransmitReceive(rfid->hspi, &zero, &(values[index]), 1, 500);
+  HAL_SPI_TransmitReceive(rfid->hspi, &zero, &(values[index]), 1, HAL_MFRC522_DEFAULT_TIMEOUT);
 	HAL_GPIO_WritePin(rfid->ss_pin.Port, rfid->ss_pin.Pin, GPIO_PIN_SET); // Disable the MFRC522 chip..
 }
 
